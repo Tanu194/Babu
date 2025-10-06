@@ -1,0 +1,111 @@
+<div id="quiz">
+  <div id="question"></div>
+  <div id="options"></div>
+</div>
+<div id="note" class="love-note hidden"></div>
+<button id="playAgain" class="hidden" onclick="restartGame()">Play Again 💌</button>
+<canvas id="hugCanvas" width="400" height="200" class="hidden"></canvas>
+<script>
+  // ===== Part 1: Questions & variables =====
+const questions = [
+  {q:"What’s my favorite color? 🌸", options:["Blue","Pink 💖","Green","Yellow"], answer:1},
+  {q:"What’s my favorite food? 🍕", options:["Pizza 💕","Burger","Ice Cream","Pasta"], answer:0},
+  {q:"What’s my favorite hobby? 🎨", options:["Painting 💖","Sleeping","Reading","Dancing"], answer:0}
+];
+
+let current = 0;
+let score = 0;
+// ===== Part 2: Show question & handle answer =====
+function showQuestion(){
+  const qDiv = document.getElementById("question");
+  const oDiv = document.getElementById("options");
+  qDiv.innerText = questions[current].q;
+  oDiv.innerHTML = "";
+  questions[current].options.forEach((opt,i)=>{
+    const btn = document.createElement("button");
+    btn.innerText = opt;
+    btn.onclick = ()=>checkAnswer(i);
+    oDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected){
+  if(selected === questions[current].answer) score++;
+  current++;
+  if(current < questions.length) showQuestion();
+  else endGame();
+}
+// ===== Part 3: End game & restart =====
+function endGame(){
+  document.getElementById("quiz").classList.add("hidden");
+  showLoveMessage();
+  createConfetti();
+  playHugAnimation();
+  document.getElementById("playAgain").classList.remove("hidden");
+}
+
+function restartGame(){
+  current=0; score=0;
+  document.getElementById("quiz").classList.remove("hidden");
+  document.getElementById("note").classList.add("hidden");
+  document.getElementById("playAgain").classList.add("hidden");
+  document.getElementById("hugCanvas").classList.add("hidden");
+  showQuestion();
+}
+// ===== Part 4: Show love message =====
+function showLoveMessage(){
+  const note = document.getElementById("note");
+  note.innerHTML = `
+    🎉 Yay! You scored ${score}/${questions.length}! 💖<br>
+    I knew you could do it 😘<br>
+    I Love You Forever, Armaan 💕💞<br>
+    You make my world brighter 🌟
+  `;
+  note.classList.remove("hidden");
+}
+// ===== Part 5: Confetti & Hug Animation =====
+function createConfetti(){
+  const colors = ["#ff4d6d","#ff85a2","#d63384","#ffb3c6"];
+  for(let i=0;i<100;i++){
+    const conf = document.createElement("div");
+    conf.classList.add("confetti-piece");
+    conf.style.left=Math.random()*window.innerWidth+"px";
+    conf.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+    document.body.appendChild(conf);
+    let top=-10;
+    const speed=2+Math.random()*3;
+    const fall = setInterval(()=>{
+      top+=speed;
+      conf.style.top=top+"px";
+      if(top>window.innerHeight){ clearInterval(fall); conf.remove(); }
+    },16);
+  }
+}
+
+function playHugAnimation(){
+  const hugCanvas = document.getElementById("hugCanvas");
+  hugCanvas.classList.remove("hidden");
+  const ctxH = hugCanvas.getContext("2d");
+
+  let leftHeart = {x:50, y:100};
+  let rightHeart = {x:350, y:100};
+
+  const hugInterval = setInterval(()=>{
+    ctxH.clearRect(0,0,hugCanvas.width,hugCanvas.height);
+
+    ctxH.fillStyle = "#ff4d6d";
+    ctxH.beginPath();
+    ctxH.arc(leftHeart.x,leftHeart.y,25,0,Math.PI*2); ctxH.fill();
+    ctxH.beginPath();
+    ctxH.arc(rightHeart.x,rightHeart.y,25,0,Math.PI*2); ctxH.fill();
+
+    if(leftHeart.x<175) leftHeart.x+=2;
+    if(rightHeart.x>225) rightHeart.x-=2;
+
+    if(leftHeart.x>=175 && rightHeart.x<=225){ clearInterval(hugInterval); }
+  },16);
+}
+
+// ===== Start the game =====
+showQuestion();
+</script>
